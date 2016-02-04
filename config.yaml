@@ -1,0 +1,58 @@
+key:         assetcolorextractor
+id:          assetcolorextractor
+name:        'Asset Color Extractor'
+description: 'Extract colors from image assets.'
+author_name: 'Dan Wolfgang, Endevver'
+author_link: http://endevver.com
+plugin_link: https://github.com/endevver/mt-plugin-asset-color-extractor
+version:     1.0.0
+
+object_types:
+    asset.image:
+        extracted_colors: text meta
+
+blog_config_template: config.mtml
+
+settings:
+    number_of_colors:
+        scope:   blog
+        default: 5
+
+callbacks:
+    cms_upload_file.image: $AssetColorExtractor::AssetColorExtractor::Plugin::upload_file_callback
+    api_upload_file.image: $AssetColorExtractor::AssetColorExtractor::Plugin::upload_file_callback
+    template_param.edit_asset:
+        handler: AssetColorExtractor::CMS::add_asset_meta
+        # Seems to need a higher priority when interacting with some plugins...
+        # priority: 4
+
+page_actions:
+    asset:
+        extract_color:
+            label:     'Extract Color'
+            order:     500
+            code:      $AssetColorExtractor::AssetColorExtractor::CMS::page_action_extract_color
+            condition: $AssetColorExtractor::AssetColorExtractor::CMS::page_action_condition
+
+list_actions:
+    asset:
+        extract_color:
+            label:           'Extract Color'
+            order:           500
+            code:            $AssetColorExtractor::AssetColorExtractor::CMS::list_action_extract_color
+            continue_prompt: 'Are you sure you want to extract colors from the selected asset(s)?'
+
+list_properties:
+    asset:
+        extracted_colors:
+            label:   'Extracted Colors'
+            col:     extracted_colors
+            order:   600
+            display: optional
+            html:    $AssetColorExtractor::AssetColorExtractor::CMS::colors_column_list_property
+
+tags:
+    block:
+        AssetExtractedColors: $AssetColorExtractor::AssetColorExtractor::Tags::block_extracted_colors
+    function:
+        AssetExtractedColor: $AssetColorExtractor::AssetColorExtractor::Tags::function_extracted_color

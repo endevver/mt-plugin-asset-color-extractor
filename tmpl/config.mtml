@@ -1,0 +1,17 @@
+<mtapp:Setting
+    id="number_of_colors"
+    label="Number of Colors to Extract"
+    hint="Choose the number of colors to be extracted from an image asset. This value acts as a limiter; no more than this number will be extracted. Simpler images may extract fewer colors."
+    show_hint="1">
+    <select
+        name="number_of_colors"
+        id="number_of_colors">
+    <mt:For from="0" to="25" step="1">
+        <mt:Var name="__index__" setvar="number">
+        <option value="<mt:Var name="number">"
+            <mt:If name="number_of_colors" eq="$number">selected</mt:If>>
+            <mt:Var name="number">
+        </option>
+    </mt:For>
+    </select>
+</mtapp:Setting>
