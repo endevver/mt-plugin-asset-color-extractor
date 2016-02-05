@@ -9,7 +9,11 @@ This plugin for Movable Type will look at any image asset and extract a set of c
 
 # Configuration
 
-The maximum number of colors to be extracted can be specified on a per-blog basis. Visit Tools > Plugins > Asset Color Extractor > Settings to specify this option. Note that the option is the *maximum* number of colors to be extracted. Simple or small images can return few results.
+The maximum number of colors to be extracted can be specified on a per-blog basis. Visit Tools > Plugins > Asset Color Extractor > Settings to specify this option. Note that the option is the *maximum* number of colors to be extracted. Simple or small images can return few results. "5" is likely a good balance between what can be extracted from images; some less complex images may only find one, two, or three colors and only the most complex images will return more than ten.
+
+The colors are identified based upon commonality and frequency of use in the image histogram. Most typically, this means that the images background colors are going to appear in the palette first while less common colors will be at the end of the palette. The plugin reduces the image's complexity to find a color palette and this can also mean that a given color's frequency is not high enough in the histogram to extract that color. In other words, it's not a perfect tool.
+
+If you want to use a color to blend in with the image, the first extracted color is likely a good choice. Better accent color choices can likely be found further along in the palette -- perhaps the 3rd or 5th color extracted, for example.
 
 # Use
 
@@ -60,6 +64,8 @@ The `AssetExtractedColor` tag can also be used without the `AssetExtractedColors
         </span>
     </p>
     </mt:Assets>
+
+The `AssetExtractedColor` tag will try to output the requested color. If it's not available, however, it will ourput the previously available color. For example, if a palette of three colors has been found and the template includes `<mt:AssetExtractedColor index="5">`, the then tag will output the third (last) color in the palette.
 
 # License
 
