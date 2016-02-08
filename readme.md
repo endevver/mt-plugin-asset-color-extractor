@@ -60,6 +60,11 @@ colors. It has no arguments. The meta variables `__first__`, `__last__`,
 `__even__`, `__odd__`, and `__counter__` can be used with this tag. Example use
 is below.
 
+The `AssetExtractedColors` block tag takes one argument: `generate`. Setting
+this argument to true (`1`) will cause the tag to extract colors from the image
+if not already availabe. This can be a good way to extract colors from older
+assets, but note that it can be resource intensive!
+
 ## AssetExtractedColor
 
 The `AssetExtractedColor` function tag outputs the extracted color. This can be
@@ -97,6 +102,21 @@ not available, however, it will ourput the previously available color. For
 example, if a palette of three colors has been found and the template includes
 `<mt:AssetExtractedColor index="5">`, the then tag will output the third (last)
 color in the palette.
+
+Additionally, the `AssetExtractedColor` tag supports the `generate` argument.
+Setting this argument to true (`1`) will cause the tag to extract colors from
+the image if not already available. This can be a good way to extract colors
+from older assets, but note that it can be resource intensive!
+
+    <mt:Assets>
+    <p>
+        <mt:AssetLabel>:
+        <span style="width: 20px; height: 20px; display: inline-block;
+            background-color: <mt:AssetExtractedColor index="2" generate="1">">
+            my color
+        </span>
+    </p>
+    </mt:Assets>
 
 # License
 

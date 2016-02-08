@@ -9,16 +9,16 @@ sub block_extracted_colors {
     my $builder = $ctx->stash('builder');
     my $tokens  = $ctx->stash('tokens');
     my $asset   = $ctx->stash('asset');
-    
+
     # Verify that this is an image asset.
     return if ($asset->class !~ m/(image|photo)/);
-    
+
     my @extracted_colors = split(',', $asset->extracted_colors);
 
     # No colors found? Extract them now. This isn't a user-configurable setting
     # so whatever colors we get are good. And, if they are being published then
     # they are obviously needed.
-    if (!@extracted_colors) {
+    if (!@extracted_colors && $args->{generate} == 1) {
         require AssetColorExtractor::Plugin;
         $asset = AssetColorExtractor::Plugin::extract_color( $asset );
         @extracted_colors = split(',', $asset->extracted_colors);
