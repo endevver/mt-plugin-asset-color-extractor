@@ -19,15 +19,18 @@ sub upload_file_callback {
 # image histogram. Save as asset meta.
 sub extract_color {
     my ($asset) = @_;
+
+    return unless $asset && $asset->id && $asset->class =~ m/(image|photo)/;
+
+    # We don't want to be able to re-extract colors over and over again...
+    # right? I think the only use case is if the max number of extracted colors
+    # has been changed, but as it's the *maximum* number to be extracted, that
+    # won't necessarily even change any existing asset.
+    return if $asset->extracted_colors;
+
     my $blog_id = $asset->blog_id;
 
-    # Verify that this is an image asset.
-    return if ($asset->class !~ m/(image|photo)/);
-
-    my $image = Image::Magick->new;
-    $image->Read( filename => $asset->file_path );
-
-    if (! $image) {
+    if (! -f $asset->file_path) {
         MT->log({
             class    => 'Asset Color Extractor',
             category => 'extract_color',
@@ -38,6 +41,9 @@ sub extract_color {
         });
         return 1;
     }
+
+    my $image = Image::Magick->new;
+    $image->Read( filename => $asset->file_path );
 
     # Reduce the number of colors. Resizing simplifies and better places
     # emphasis on color differences, and Segment helps to homogenize colors.
