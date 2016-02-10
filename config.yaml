@@ -21,6 +21,7 @@ settings:
 callbacks:
     cms_upload_file.image: $AssetColorExtractor::AssetColorExtractor::Plugin::upload_file_callback
     api_upload_file.image: $AssetColorExtractor::AssetColorExtractor::Plugin::upload_file_callback
+    MT::Asset::Image::post_insert: $AssetColorExtractor::AssetColorExtractor::Plugin::post_insert_callback
     template_param.edit_asset:
         handler: AssetColorExtractor::CMS::add_asset_meta
         # Seems to need a higher priority when interacting with some plugins...

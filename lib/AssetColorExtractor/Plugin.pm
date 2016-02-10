@@ -14,6 +14,11 @@ sub upload_file_callback {
     extract_color( $asset );
 }
 
+sub post_insert_callback {
+    my ($cb, $app, $obj, $original) = @_;
+    extract_color( $obj );
+}
+
 # Do the actual color extraction. An image asset should have been provided.
 # Reduce the color depth to even out the colors, then extract them based on the
 # image histogram. Save as asset meta.
