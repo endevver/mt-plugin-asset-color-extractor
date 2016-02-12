@@ -48,6 +48,13 @@ Extracted colors can be reviewed in two ways:
 * The Manage Assets screen includes a new column for the Listing Framework,
   "Extracted Colors," which presents small samples of the extracted colors.
 
+Need to extract colors from all existing assets, and you've got a lot of
+assets? Included is a small script to help: `extract-colors.pl`. From your
+MT_HOME, run `./plugins/AssetColorExtractor/extract-colors.pl` to process all
+image assets in the system. Restrict it by adding the blog ID, for example
+`./plugins/AssetColorExtractor/extract-colors.pl 7` to extract colors only for
+assets in blog ID 7.
+
 # Template Tags
 
 Two template tags are provided to make working with the extracted colors easy.
