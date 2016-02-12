@@ -44,7 +44,7 @@ sub extract_color {
             message  => 'The Asset Color Extractor plugin could not read the'
                 . ' specified file at ' . $asset->file_path . '.',
         });
-        return 1;
+        return;
     }
 
     my $image = Image::Magick->new;
@@ -86,7 +86,8 @@ sub extract_color {
 
     my @saved_colors;
     for ( my $i = 0; $i < $num_of_colors; $i++ ) {
-        push @saved_colors, $hist_entries[$i]->{hex};
+        push @saved_colors, $hist_entries[$i]->{hex}
+            if $hist_entries[$i]->{hex};
     }
 
     $asset->extracted_colors( join(',', @saved_colors) );
