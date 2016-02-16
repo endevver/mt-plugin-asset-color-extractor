@@ -20,8 +20,9 @@ sub block_extracted_colors {
     # they are obviously needed.
     if (!@extracted_colors && $args->{generate} == 1) {
         require AssetColorExtractor::Plugin;
-        $asset = AssetColorExtractor::Plugin::extract_color( $asset );
-        @extracted_colors = split(',', $asset->extracted_colors);
+        $asset = AssetColorExtractor::Plugin::create_extract_color_worker(
+            $asset->id
+        );
     }
 
     my $res  = '';
@@ -56,8 +57,8 @@ sub function_extracted_color {
     # In the AssetExtractedColors block?
     my $extracted_color = $ctx->stash('asset_extracted_color');
 
-    # If we're not in the AssetExtractedColors block, just return the first
-    # color in the array for the template.
+    # If we're not in the AssetExtractedColors block, the AssetExtractedColor
+    # tag may have been called outside of it.
     if (!defined $extracted_color) {
         my $asset = $ctx->stash('asset');
 
@@ -71,7 +72,9 @@ sub function_extracted_color {
         # published then they are obviously needed.
         if (!@extracted_colors && $args->{generate} == 1) {
             require AssetColorExtractor::Plugin;
-            $asset = AssetColorExtractor::Plugin::extract_color( $asset );
+            $asset = AssetColorExtractor::Plugin::create_extract_color_worker(
+                $asset->id
+            );
             @extracted_colors = split(',', $asset->extracted_colors);
         }
 

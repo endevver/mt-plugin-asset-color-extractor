@@ -7,6 +7,7 @@ colors from the image.
 
 * Image Magick
 * Movable Type 6.2+
+* `run-periodic-tasks` must be set up
 
 # Configuration
 
@@ -41,6 +42,26 @@ ways:
 * With the "Extract Colors" List Action on the Manage Assets screen. (Choose
   assets then select "Extract Colors" from the "Actions..." dropdown.)
 
+Need to extract colors from all existing assets, and you've got a lot of
+assets? Included is a small script to help: `extract-colors.pl`. From your
+MT_HOME, run `./plugins/AssetColorExtractor/extract-colors.pl` to process all
+image assets in the system. Restrict it by adding the blog ID, for example
+`./plugins/AssetColorExtractor/extract-colors.pl 7` to extract colors only for
+assets in blog ID 7.
+
+All of these extraction methods work the same way, creating a new Worker for
+each asset. This is where `run-periodic-tasks` comes in: the extraction worker
+is run by `run-periodic-tasks` (informally, the "Publish Queue"). This also
+means that when choosign to extract colors they are typically not going to be
+available immediately; you must wait until the Worker finishes. Why do it this
+way? Most image assets can extract a color palette pretty quickly, but I found
+that some assets would take a long time to parse (often upwards of one minute).
+The commonality I found amongst image assets that took a long time to process
+wasn't file size or pixel dimensions, but sharpness. Images that are *not
+quite* sharp took quite a while. The only reasonable way to handle this, then,
+was to offload the extraction to another process that wouldn't leave the user
+waiting.
+
 Extracted colors can be reviewed in two ways:
 
 * The Edit Asset screen will show an "Extracted Colors" section which presents
@@ -48,12 +69,6 @@ Extracted colors can be reviewed in two ways:
 * The Manage Assets screen includes a new column for the Listing Framework,
   "Extracted Colors," which presents small samples of the extracted colors.
 
-Need to extract colors from all existing assets, and you've got a lot of
-assets? Included is a small script to help: `extract-colors.pl`. From your
-MT_HOME, run `./plugins/AssetColorExtractor/extract-colors.pl` to process all
-image assets in the system. Restrict it by adding the blog ID, for example
-`./plugins/AssetColorExtractor/extract-colors.pl 7` to extract colors only for
-assets in blog ID 7.
 
 # Template Tags
 
@@ -111,9 +126,9 @@ example, if a palette of three colors has been found and the template includes
 color in the palette.
 
 Additionally, the `AssetExtractedColor` tag supports the `generate` argument.
-Setting this argument to true (`1`) will cause the tag to extract colors from
-the image if not already available. This can be a good way to extract colors
-from older assets, but note that it can be resource intensive!
+Setting this argument to true (`1`) will cause the tag to create a Worker to
+extract colors from the image if not already available. This can be a good way
+to extract colors from older assets, too.
 
     <mt:Assets>
     <p>

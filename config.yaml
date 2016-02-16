@@ -5,11 +5,16 @@ description: 'Extract colors from image assets.'
 author_name: 'Dan Wolfgang, Endevver'
 author_link: http://endevver.com
 plugin_link: https://github.com/endevver/mt-plugin-asset-color-extractor
-version:     1.0.3
+version:     1.0.4
 
 object_types:
     asset.image:
         extracted_colors: text meta
+
+task_workers:
+    asset_color_extractor:
+        label: Asset Color Extractor
+        class: AssetColorExtractor::Worker::Extract
 
 blog_config_template: config.mtml
 
@@ -34,6 +39,7 @@ page_actions:
             order:     500
             code:      $AssetColorExtractor::AssetColorExtractor::CMS::page_action_extract_color
             condition: $AssetColorExtractor::AssetColorExtractor::CMS::page_action_condition
+            continue_prompt: "Are you sure you want to extract colors from the selected asset(s)?\n(Colors will not be extracted immediately; workers will be added to the Publish Queue to extract colors.)"
 
 list_actions:
     asset:
@@ -41,7 +47,7 @@ list_actions:
             label:           'Extract Color'
             order:           500
             code:            $AssetColorExtractor::AssetColorExtractor::CMS::list_action_extract_color
-            continue_prompt: 'Are you sure you want to extract colors from the selected asset(s)?'
+            continue_prompt: "Are you sure you want to extract colors from the selected asset(s)?\n(Colors will not be extracted immediately; workers will be added to the Publish Queue to extract colors.)"
 
 list_properties:
     asset:

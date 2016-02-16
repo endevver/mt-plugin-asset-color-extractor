@@ -8,7 +8,6 @@ use lib qw( lib extlib plugins/AssetColorExtractor/lib );
 use base qw( MT::Tool );
 use MT;
 use AssetColorExtractor::Plugin;
-use Data::Dumper;
 use MT::Asset;
 
 sub main {
@@ -30,11 +29,9 @@ sub main {
     );
 
     while ( my $asset = $iter->() ) {
-        ($asset) = AssetColorExtractor::Plugin::extract_color( $asset );
-        if ($asset) {
-            print '* Extracted colors for "' . $asset->file_name . '" from blog ID '
-                . $asset->blog_id . ': ' . $asset->extracted_colors . "\n";
-        }
+        AssetColorExtractor::Plugin::create_extract_color_worker( $asset->id );
+        print '* Created Worker for "' . $asset->file_name . '" from blog ID '
+            . $asset->blog_id . "\n";
     }
 }
 

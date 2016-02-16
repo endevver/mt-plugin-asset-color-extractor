@@ -11,12 +11,34 @@ sub upload_file_callback {
     my $cb = shift;
     my (%params) = @_;
     my $asset = $params{'Asset'};
-    extract_color( $asset );
+    create_extract_color_worker( $asset->id );
 }
 
 sub post_insert_callback {
     my ($cb, $app, $obj, $original) = @_;
-    extract_color( $obj );
+    create_extract_color_worker( $obj->id );
+}
+
+sub create_extract_color_worker {
+    my ($asset_id) = @_;
+    my $app = MT->instance;
+
+    if (
+        ! $app->model('ts_job')->exist({
+            funcname => 'AssetColorExtractor::Worker::Extract',
+            coalesce => $asset_id,
+        })
+    ) {
+        require TheSchwartz::Job;
+        require MT::TheSchwartz;
+        my $job = TheSchwartz::Job->new();
+        $job->funcname(  'AssetColorExtractor::Worker::Extract' );
+        $job->coalesce(  $asset_id                       );
+        $job->uniqkey(   $asset_id                       );
+        $job->priority(  1                                );
+        $job->run_after( time()                           );
+        MT::TheSchwartz->insert( $job );
+    }
 }
 
 # Do the actual color extraction. An image asset should have been provided.
@@ -92,6 +114,16 @@ sub extract_color {
 
     $asset->extracted_colors( join(',', @saved_colors) );
     $asset->save or die $asset->errstr;
+
+    MT->log({
+        class    => 'Asset Color Extractor',
+        category => 'extract_color',
+        level    => MT->model('log')->INFO(),
+        blog_id  => $blog_id,
+        message  => 'The Asset Color Extractor plugin saved the colors '
+            . join(', ', @saved_colors) . ' from asset ID ' . $asset->id
+            . ', file ' . $asset->file_path . '.',
+    });
 
     return $asset;
 }
