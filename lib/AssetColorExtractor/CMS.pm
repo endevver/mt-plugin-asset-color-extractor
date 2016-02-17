@@ -10,7 +10,7 @@ sub colors_column_list_property {
     my $prop = shift;
     my ( $obj, $app, $opts ) = @_;
 
-    my @colors = split(',', $obj->meta('extracted_colors'));
+    my @colors = split(',', ($obj->meta('extracted_colors')||''));
 
     my $html = '';
 
@@ -100,7 +100,7 @@ sub add_asset_meta {
     );
 
     my $html = '';
-    foreach my $color ( split(',', $asset->extracted_colors) ) {
+    foreach my $color ( split(',', ($asset->extracted_colors||'')) ) {
         $html .= '<div style="width: 50px; height: 50px; '
             . 'border: 1px solid #ccc; display: block; float: left; '
             . 'overflow: hidden; margin: 0 5px 5px 0; '

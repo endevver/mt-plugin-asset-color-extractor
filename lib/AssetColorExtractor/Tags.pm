@@ -13,7 +13,7 @@ sub block_extracted_colors {
     # Verify that this is an image asset.
     return if ($asset->class !~ m/(image|photo)/);
 
-    my @extracted_colors = split(',', $asset->extracted_colors);
+    my @extracted_colors = split(',', ($asset->extracted_colors||''));
 
     # No colors found? Extract them now. This isn't a user-configurable setting
     # so whatever colors we get are good. And, if they are being published then
@@ -65,7 +65,7 @@ sub function_extracted_color {
         # Verify that this is an image asset.
         return if ($asset->class !~ m/(image|photo)/);
 
-        my @extracted_colors = split(',', $asset->extracted_colors);
+        my @extracted_colors = split(',', ($asset->extracted_colors||''));
 
         # No colors found? Extract them now. This isn't a user-configurable
         # setting so whatever colors we get are good. And, if they are being
@@ -75,7 +75,7 @@ sub function_extracted_color {
             $asset = AssetColorExtractor::Plugin::create_extract_color_worker(
                 $asset->id
             );
-            @extracted_colors = split(',', $asset->extracted_colors);
+            @extracted_colors = split(',', ($asset->extracted_colors||''));
         }
 
         # Grab the requested position in the array for the template, as a way
