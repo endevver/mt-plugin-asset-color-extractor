@@ -2,8 +2,9 @@ package AssetColorExtractor::Plugin;
 
 use strict;
 use warnings;
-
 use Image::Magick;
+use Class::Load qw( load_class );
+use Scalar::Util qw( blessed );
 
 # Extract colors on file upload. This is for both the CMS and API callback
 # methods.
@@ -11,34 +12,50 @@ sub upload_file_callback {
     my $cb = shift;
     my (%params) = @_;
     my $asset = $params{'Asset'};
-    create_extract_color_worker( $asset->id );
+    extract_color_async( $asset );
 }
 
 sub post_insert_callback {
     my ($cb, $app, $obj, $original) = @_;
-    create_extract_color_worker( $obj->id );
+    extract_color_async( $obj );
+}
+
+sub extract_color_async {
+    shift if $_[0] eq __PACKAGE__; # supports method invocation
+    my $a = shift;
+    if ( blessed($a) && $a->isa('MT::Asset') ) {    # support MT::Asset object
+        $a = { id => $a->id, blog_id => $a->blog_id }
+    }
+    elsif ( 'HASH' ne ref($a) ) {   # croak unless hash ref
+        require Carp;
+        Carp::croak(
+              __PACKAGE__.'::extract_color_async takes single '
+            . 'argument of either an MT::Asset object or a hashref containing '
+            . 'the asset id and blog_id'
+        );
+    }
+
+    my $job = load_class('TheSchwartz::Job')->new(
+                  funcname  => 'AssetColorExtractor::Worker::Extract',
+                  coalesce  => $a->{id},
+                  uniqkey   => $a->{id},
+                  priority  => 1,
+              );
+
+    # Insert and notify if job is new
+    if (my $handle = load_class('MT::TheSchwartz')->insert($job)) {
+        printf STDERR 'Color extraction job ID %d added for asset ID %s '
+                    . "(blog ID:%s) at %s, line %s",
+                    $handle->jobid, $a->{id}, $a->{blog_id}, __FILE__, __LINE__;
+        return $handle;
+    }
+    return 1;
 }
 
 sub create_extract_color_worker {
-    my ($asset_id) = @_;
-    my $app = MT->instance;
-
-    if (
-        ! $app->model('ts_job')->exist({
-            funcname => 'AssetColorExtractor::Worker::Extract',
-            coalesce => $asset_id,
-        })
-    ) {
-        require TheSchwartz::Job;
-        require MT::TheSchwartz;
-        my $job = TheSchwartz::Job->new();
-        $job->funcname(  'AssetColorExtractor::Worker::Extract' );
-        $job->coalesce(  $asset_id                       );
-        $job->uniqkey(   $asset_id                       );
-        $job->priority(  1                                );
-        $job->run_after( time()                           );
-        MT::TheSchwartz->insert( $job );
-    }
+    warn 'create_extract_color_worker is deprecated. '
+        .'Please use extract_color_async';
+    extract_color_async({ id => shift() });
 }
 
 # This method is executed by the post_init callback and explicitly defines

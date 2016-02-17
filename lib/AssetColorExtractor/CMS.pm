@@ -40,7 +40,7 @@ sub list_action_extract_color {
             or next;
 
         # Create a Worker to do the color extraction.
-        AssetColorExtractor::Plugin::create_extract_color_worker( $asset->id );
+        AssetColorExtractor::Plugin::extract_color_async( $asset );
     }
 
     $app->add_return_arg( color_extracted => 1 );
@@ -61,7 +61,7 @@ sub page_action_extract_color {
         or next;
 
     # Create a Worker to do the color extraction.
-    AssetColorExtractor::Plugin::create_extract_color_worker( $asset->id );
+    AssetColorExtractor::Plugin::extract_color_async( $asset );
 
     $app->add_return_arg( color_extracted => 1 );
     $app->call_return;

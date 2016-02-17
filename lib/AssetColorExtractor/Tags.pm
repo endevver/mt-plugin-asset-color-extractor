@@ -20,9 +20,7 @@ sub block_extracted_colors {
     # they are obviously needed.
     if (!@extracted_colors && $args->{generate} == 1) {
         require AssetColorExtractor::Plugin;
-        $asset = AssetColorExtractor::Plugin::create_extract_color_worker(
-            $asset->id
-        );
+        AssetColorExtractor::Plugin::extract_color_async($asset);
     }
 
     my $res  = '';
@@ -72,9 +70,7 @@ sub function_extracted_color {
         # published then they are obviously needed.
         if (!@extracted_colors && $args->{generate} == 1) {
             require AssetColorExtractor::Plugin;
-            $asset = AssetColorExtractor::Plugin::create_extract_color_worker(
-                $asset->id
-            );
+            AssetColorExtractor::Plugin::extract_color_async($asset);
             @extracted_colors = split(',', ($asset->extracted_colors||''));
         }
 

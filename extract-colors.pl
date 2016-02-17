@@ -29,7 +29,7 @@ sub main {
     );
 
     while ( my $asset = $iter->() ) {
-        AssetColorExtractor::Plugin::create_extract_color_worker( $asset->id );
+        AssetColorExtractor::Plugin::extract_color_async( $asset );
         print '* Created Worker for "' . $asset->file_name . '" from blog ID '
             . $asset->blog_id . "\n";
     }
