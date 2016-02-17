@@ -115,10 +115,10 @@ sub add_asset_meta {
     $colors_field->innerHTML( $html );
 
     my $tags_field = $tmpl->getElementById('asset-url')
-        or die MT->log('Cannot identify the Asset URL field block in template');
+        or die MT->instance->log('Cannot identify the Asset URL field block in template');
 
     $tmpl->insertAfter( $colors_field, $tags_field )
-        or die MT->log('Failed to insert the Camera Metadata field into template.');
+        or die MT->instance->log('Failed to insert the Camera Metadata field into template.');
 }
 
 1;

@@ -92,7 +92,7 @@ sub extract_color {
     my $blog_id = $asset->blog_id;
 
     if (! -f $asset->file_path) {
-        MT->log({
+        MT->instance->log({
             class    => 'Asset Color Extractor',
             category => 'extract_color',
             level    => MT->model('log')->ERROR(),
@@ -149,7 +149,7 @@ sub extract_color {
     $asset->extracted_colors( join(',', @saved_colors) );
     $asset->save or die $asset->errstr;
 
-    MT->log({
+    MT->instance->log({
         class    => 'Asset Color Extractor',
         category => 'extract_color',
         level    => MT->model('log')->INFO(),
