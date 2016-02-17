@@ -71,6 +71,8 @@ sub function_extracted_color {
         if (!@extracted_colors && $args->{generate} == 1) {
             require AssetColorExtractor::Plugin;
             AssetColorExtractor::Plugin::extract_color_async($asset);
+            # FIXME DAN: The following is going to fail because the extraction is asynchronous.
+            # So how should the rest of this method be handled?
             @extracted_colors = split(',', ($asset->extracted_colors||''));
         }
 

@@ -146,6 +146,8 @@ sub extract_color {
             if $hist_entries[$i]->{hex};
     }
 
+    # FIXME Dan Can @saved_colors ever be empty here? If so, handle it.
+
     $asset->extracted_colors( join(',', @saved_colors) );
     $asset->save or die $asset->errstr;
 
