@@ -41,6 +41,23 @@ sub create_extract_color_worker {
     }
 }
 
+# This method is executed by the post_init callback and explicitly defines
+# the MT::Asset::extracted_colors method.
+sub add_asset_method {
+    # It is required by the gWizMobile Data API plugin in order to make
+    # MT::DataAPI::Resource recognize extracted_colors as a valid asset field
+    # (included by gWizMobile::DataAPI::Resource::Asset) and hence provision
+    # the asset resource with its value.  It fails to do so because all meta
+    # field methods are AUTOLOADed, MT::DataAPI::Resource uses UNIVERSAL::can()
+    # to check for valid methods and AUTOLOADed methods are not visible to can()
+    # (should use UNIVERSAL::DOES, I believe, or just try/eval)
+    package MT::Asset {
+        sub extracted_colors {
+            shift()->meta('extracted_colors', @_);
+        };
+    };
+}
+
 # Do the actual color extraction. An image asset should have been provided.
 # Reduce the color depth to even out the colors, then extract them based on the
 # image histogram. Save as asset meta.

@@ -24,6 +24,7 @@ settings:
         default: 5
 
 callbacks:
+    post_init: $AssetColorExtractor::AssetColorExtractor::Plugin::add_asset_method
     cms_upload_file.image: $AssetColorExtractor::AssetColorExtractor::Plugin::upload_file_callback
     api_upload_file.image: $AssetColorExtractor::AssetColorExtractor::Plugin::upload_file_callback
     MT::Asset::Image::post_insert: $AssetColorExtractor::AssetColorExtractor::Plugin::post_insert_callback
