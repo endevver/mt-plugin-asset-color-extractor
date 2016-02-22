@@ -147,19 +147,36 @@ sub extract_color {
     }
 
     # FIXME Dan Can @saved_colors ever be empty here? If so, handle it.
+    # Can @saved_colors be empty? There are probably scenarios where a color
+    # can't be extracted. That's ok -- not recording a value makes it easy to
+    # use a default at publish time.
+    if (@saved_colors){
+        $asset->extracted_colors( join(',', @saved_colors) );
+        $asset->save or die $asset->errstr;
 
-    $asset->extracted_colors( join(',', @saved_colors) );
-    $asset->save or die $asset->errstr;
-
-    MT->instance->log({
-        class    => 'Asset Color Extractor',
-        category => 'extract_color',
-        level    => MT->model('log')->INFO(),
-        blog_id  => $blog_id,
-        message  => 'The Asset Color Extractor plugin saved the colors '
-            . join(', ', @saved_colors) . ' from asset ID ' . $asset->id
-            . ', file ' . $asset->file_path . '.',
-    });
+        MT->instance->log({
+            class    => 'Asset Color Extractor',
+            category => 'extract_color',
+            level    => MT->model('log')->INFO(),
+            blog_id  => $blog_id,
+            message  => 'The Asset Color Extractor plugin saved the colors '
+                . join(', ', @saved_colors) . ' from asset ID ' . $asset->id
+                . ', file ' . $asset->file_path . '.',
+        });
+    }
+    else {
+        # Is failing to extract a color an error? Unexpected, sure, but not
+        # necessarily an error.
+        MT->instance->log({
+            class    => 'Asset Color Extractor',
+            category => 'extract_color_failed',
+            level    => MT->model('log')->ERROR(),
+            blog_id  => $blog_id,
+            message  => 'The Asset Color Extractor plugin could not extract '
+                . 'any colors from asset ID ' . $asset->id . ', file '
+                . $asset->file_path . '.',
+        });
+    }
 
     return $asset;
 }
