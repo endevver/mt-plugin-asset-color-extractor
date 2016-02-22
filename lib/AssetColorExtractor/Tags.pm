@@ -78,7 +78,7 @@ sub function_extracted_color {
 
         # Grab the requested position in the array for the template, as a way
         # to get the second color, for example.
-        my $i = $args->{'index'};
+        my $i = $args->{'index'} || 1;
         $i--; # Index starts at 0, so subtract 1 from whatever was requested.
 
         # Try to grab the requested color index. If unavailable use the
