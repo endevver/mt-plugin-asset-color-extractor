@@ -6,6 +6,53 @@ use Image::Magick;
 use Class::Load qw( load_class );
 use Scalar::Util qw( blessed );
 
+sub data_api_fields {
+    [   {   name        => 'extractedColors',
+            from_object => sub {
+                my ($obj) = @_;
+                return $obj->has_meta('extracted_colors')
+                    ? ($obj->meta('extracted_colors') || undef) : undef;
+            },
+            bulk_from_object => sub {
+                my ( $objs, $hashes ) = @_;
+                for my $i ( 0 .. ( scalar(@$objs) - 1 ) ) {
+                    my $obj  = $objs->[$i];
+                    $hashes->[$i]->{extractedColors} =
+                         $obj->has_meta('extracted_colors')
+                             ? ($obj->extracted_colors || undef) : undef;
+                }
+            },
+        },
+        {   name    => 'color',
+            from_object => sub {
+                my ($obj) = @_;
+                my $color = (split(',', ($obj->extracted_colors//'')))[-1];
+                unless ( $color ) {
+                    # No previous color extraction! Create asynchronous extraction job
+                    __PACKAGE__->extract_color_async({
+                        id => $obj->id, blog_id => $obj->blog_id
+                    });
+                }
+                return $color;
+            },
+            bulk_from_object => sub {
+                my ( $objs, $hashes ) = @_;
+                for my $i ( 0 .. ( scalar(@$objs) - 1 ) ) {
+                    my $obj  = $objs->[$i];
+                    my $color = (split(',', ($obj->extracted_colors//'')))[-1];
+                    unless ( $color ) {
+                        # No previous color extraction! Create asynchronous extraction job
+                        __PACKAGE__->extract_color_async({
+                            id => $obj->id, blog_id => $obj->blog_id
+                        });
+                    }
+                    $hashes->[$i]->{color} = $color;
+                }
+            }
+        },
+    ];
+}
+
 # Extract colors on file upload. This is for both the CMS and API callback
 # methods.
 sub upload_file_callback {
