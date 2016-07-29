@@ -92,7 +92,7 @@ sub extract_color_async {
     # Insert and notify if job is new
     if (my $handle = load_class('MT::TheSchwartz')->insert($job)) {
         printf STDERR 'Color extraction job ID %d added for asset ID %s '
-                    . "(blog ID:%s) at %s, line %s",
+                    . "(blog ID:%s) at %s, line %s\n",
                     $handle->jobid, $a->{id}, $a->{blog_id}, __FILE__, __LINE__;
         return $handle;
     }
