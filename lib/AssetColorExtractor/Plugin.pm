@@ -225,6 +225,17 @@ sub extract_color {
         });
     }
 
+    # From http://www.imagemagick.org/script/perl-magick.php
+    #     Once you are finished with a PerlMagick object you should consider
+    #     destroying it. Each image in an image sequence is stored in virtual
+    #     memory. This can potentially add up to mebibytes of memory. Upon
+    #     destroying a PerlMagick object, the memory is returned for use by
+    #     other Perl methods. The recommended way to destroy an object is with
+    #     undef
+    # Now, It SHOULD be destroyed here once it goes out of scope but let's
+    # explicitly do it to ensure Perl's garbage collection does its job.
+    undef $image;
+
     return $asset;
 }
 
